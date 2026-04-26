@@ -1,145 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Anime Focus App</title>
-
-<style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        color: white;
-        text-align: center;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-
-        /* Anime background */
-        background: url("https://images.unsplash.com/photo-1549880338-65ddcdfd017b") no-repeat center center/cover;
-    }
-
-    .container {
-        background: rgba(0,0,0,0.6);
-        padding: 30px;
-        border-radius: 20px;
-        backdrop-filter: blur(10px);
-    }
-
-    h1 {
-        margin-bottom: 10px;
-    }
-
-    #timer {
-        font-size: 60px;
-        margin: 20px 0;
-    }
-
-    button {
-        padding: 10px 20px;
-        margin: 5px;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 16px;
-    }
-
-    .start { background: #4CAF50; }
-    .pause { background: #f39c12; }
-    .reset { background: #e74c3c; }
-
-    iframe {
-        margin-top: 20px;
-        border-radius: 10px;
-    }
-</style>
-</head>
-
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="main.css">
+        <title>TobyK1DD's World</title>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    </head>
 <body>
-
-<div class="container">
-    <h1>🎌 Anime Focus</h1>
-    <div id="mode">Focus</div>
-    <div id="timer">25:00</div>
-
-    <button class="start" onclick="startTimer()">Start</button>
-    <button class="pause" onclick="pauseTimer()">Pause</button>
-    <button class="reset" onclick="resetTimer()">Reset</button>
-
-    <!-- Lofi YouTube -->
-   <iframe
-  width="100%"
-  height="250"
-  src="https://www.youtube.com/embed/jfKfPfyJRdk"
-  title="Lofi Focus Music"
-  frameborder="0"
-  allow="autoplay; encrypted-media; picture-in-picture"
-  allowfullscreen>
-</iframe>
+    <br>
+    <div class="links"> 
+        <a href="Index.html">Home</a>
+        <a href="About Me.html">About Me</a>
+        <a href="Blog.html">Blog</a>
+        <a href="My Work.html">My Work</a>
+        <a href="Contact.html">Contact</a>
+        <a href="https://linktr.ee/tobyk1dd">Links</a>
+        <button id="themeToggle">🌙Light/Dark☀️</button>
+    </div>    
 </div>
-
+<br>
+<header><div class="header" style="padding: 0%;">
+        <img src="Images/SVG/Header3.svg" width="99%" height="50%">
+    </div></header>
+<br>
+<div class="container" style="margin-top: 10px; text-align: center; align-items: center; align-content: center;">
+    <h1>Hi I'm TobyK1DD</h1>
+    <br>
+    <p>A passionate web developer and creative enthusiast. I love exploring new technologies and sharing my journey.</p>
+    <br>
 <script>
-let focusTime = 25 * 60;
-let breakTime = 5 * 60;
-let time = focusTime;
-let timer;
-let isRunning = false;
-let isFocus = true;
+  const toggleBtn = document.getElementById("themeToggle");
 
-function updateDisplay() {
-    let minutes = Math.floor(time / 60);
-    let seconds = time % 60;
-    document.getElementById("timer").innerText =
-        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-}
+  // Load saved theme on page load
+  if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("darkmode");
+  }
 
-function startTimer() {
-    if (isRunning) return;
+  toggleBtn.addEventListener("click", () => {
+    document.body.classList.toggle("darkmode");
 
-    isRunning = true;
-    timer = setInterval(() => {
-        time--;
-
-        if (time <= 0) {
-            clearInterval(timer);
-            isRunning = false;
-
-            if (isFocus) {
-                isFocus = false;
-                time = breakTime;
-                document.getElementById("mode").innerText = "Break";
-                alert("Break time!");
-            } else {
-                isFocus = true;
-                time = focusTime;
-                document.getElementById("mode").innerText = "Focus";
-                alert("Back to focus!");
-            }
-
-            updateDisplay();
-        }
-
-        updateDisplay();
-    }, 1000);
-}
-
-function pauseTimer() {
-    clearInterval(timer);
-    isRunning = false;
-}
-
-function resetTimer() {
-    clearInterval(timer);
-    isRunning = false;
-    isFocus = true;
-    time = focusTime;
-    document.getElementById("mode").innerText = "Focus";
-    updateDisplay();
-}
-
-updateDisplay();
+    // Save preference
+    if (document.body.classList.contains("darkmode")) {
+      localStorage.setItem("theme", "dark");
+    } else {
+      localStorage.setItem("theme", "light");
+    }
+  });
 </script>
-
 </body>
 </html>
