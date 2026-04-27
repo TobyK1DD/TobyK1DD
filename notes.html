@@ -1,66 +1,445 @@
-<!DOCTYPE html>
-<html lang="en-US">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width">
-  <link rel="stylesheet" href="main.css">
-  <title>TobyK1DD's World</title>
-</head>
- <nav>
-  <br>
-      <div class="links"> 
-        <a href="Index.html">Home</a>
-        <a href="About Me.html">About Me</a>
-        <a href="Blog.html">Blog</a>
-        <a href="My Work.html">My Work</a>
-        <a href="Contact.html">Contact</a>
-        <a href="https://linktr.ee/tobyk1dd">Links</a>
-        <button id="themeToggle">🌙Darkmode☀️</button>
-    </div></nav>
-    <header><div class="header" style="padding: 0%;">
-        <img src="Header3.svg" width="99%" height="90%">
-    </div></header>
-<body>
-  <h1 style="text-align: center;">Super Simple Note Taking App</h1>
-  <br>
- <div class="container">
-    <input id="noteTitle" placeholder="Note title" />
-<br><br>
-<textarea id="noteInput" placeholder="Type your note..." rows="10" cols="50"></textarea>
-<br>
-<button onclick="saveNote()">Save Note</button>
-<button onclick="clearNotes()">Clear Notes</button>
 
-<h2>Saved Notes:</h2>
-<div id="savedNotes"></div>
-  
-<!-- Modal -->
-<div id="noteModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal()">&times;</span>
-    <h3 id="modalTitle"></h3>
-    <p id="modalText"></p>
-  </div>
-</div>
-<script>
-  const toggleBtn = document.getElementById("themeToggle");
-
-  // Load saved theme on page load
-  if (localStorage.getItem("theme") === "dark") {
-    document.body.classList.add("darkmode");
+<link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --bg:#aac0c9;--bg-soft:#c7eafb;--text:#000000;
+    --primary:#f6c14e;--border:#ffffff;--accent:#aac6d3;
+    --btn-bg:#f6c14e;--btn-text:#000000;--card:#daeef8;
+    --danger:#e55;--muted:#557;
   }
+  .dark{
+    --bg:#121212;--bg-soft:#1e1e1e;--text:#ffffff;
+    --primary:#f78af2;--border:#333333;--accent:#2a2a2a;
+    --btn-bg:#f78af2;--btn-text:#000000;--card:#1e1e1e;
+    --danger:#ff6b6b;--muted:#aaa;
+  }
+  body-wrap{display:block;}
+  #app{font-family:"Sour Gummy",sans-serif;background:var(--bg);color:var(--text);min-height:600px;padding:0;transition:background 0.3s,color 0.3s;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:var(--bg);border-bottom:2px solid var(--border);}
+  .topbar h1{font-size:22px;font-weight:800;letter-spacing:-0.5px;}
+  .topbar-right{display:flex;gap:10px;align-items:center;}
+  .btn{font-family:"Sour Gummy",sans-serif;font-size:14px;color:var(--btn-text);background:var(--btn-bg);border:2px solid var(--border);padding:7px 16px;border-radius:8px;cursor:pointer;transition:all 0.2s;font-weight:600;}
+  .btn:hover{background:var(--bg);color:var(--text);border-color:var(--primary);}
+  .btn-sm{font-size:12px;padding:5px 12px;}
+  .btn-danger{background:#e55;color:#fff;border-color:#c33;}
+  .btn-danger:hover{background:#c33;color:#fff;}
+  .btn-ghost{background:transparent;border:2px solid var(--border);color:var(--text);}
+  .btn-ghost:hover{background:var(--primary);color:#000;}
+  #login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:500px;gap:18px;padding:30px;}
+  #login-screen h2{font-size:28px;font-weight:900;text-align:center;}
+  #login-screen p{color:var(--muted);font-size:14px;text-align:center;}
+  .login-box{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:28px 32px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:14px;}
+  .login-box label{font-size:13px;font-weight:700;color:var(--text);}
+  .login-box input{font-family:"Sour Gummy",sans-serif;font-size:15px;padding:10px 14px;border-radius:8px;border:2px solid var(--border);background:var(--bg-soft);color:var(--text);width:100%;}
+  .login-box input:focus{outline:none;border-color:var(--primary);}
+  .tab-bar{display:flex;gap:6px;margin-bottom:0;}
+  .tab{font-family:"Sour Gummy",sans-serif;font-size:13px;font-weight:700;padding:6px 14px;border-radius:8px 8px 0 0;border:2px solid var(--border);border-bottom:none;background:var(--bg);cursor:pointer;color:var(--muted);}
+  .tab.active{background:var(--primary);color:#000;}
+  .main-layout{display:grid;grid-template-columns:240px 1fr;min-height:500px;}
+  .sidebar{background:var(--bg-soft);border-right:2px solid var(--border);padding:14px;display:flex;flex-direction:column;gap:10px;}
+  .sidebar h3{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+  .entry-list{display:flex;flex-direction:column;gap:6px;flex:1;overflow-y:auto;max-height:430px;}
+  .entry-item{background:var(--bg);border:2px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all 0.2s;}
+  .entry-item:hover{border-color:var(--primary);}
+  .entry-item.selected{border-color:var(--primary);background:var(--card);}
+  .entry-item-title{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .entry-item-date{font-size:11px;color:var(--muted);margin-top:2px;}
+  .entry-item-preview{font-size:12px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .editor-panel{padding:20px;display:flex;flex-direction:column;gap:14px;}
+  .editor-panel.empty{align-items:center;justify-content:center;color:var(--muted);font-size:16px;}
+  .editor-title{font-family:"Sour Gummy",sans-serif;font-size:22px;font-weight:900;background:transparent;border:none;border-bottom:2px solid var(--border);padding:8px 4px;color:var(--text);width:100%;}
+  .editor-title:focus{outline:none;border-color:var(--primary);}
+  .editor-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .editor-meta span{font-size:12px;color:var(--muted);}
+  .mood-picker{display:flex;gap:6px;}
+  .mood-btn{background:var(--bg);border:2px solid var(--border);border-radius:8px;padding:4px 10px;font-size:16px;cursor:pointer;transition:all 0.2s;}
+  .mood-btn:hover,.mood-btn.active{border-color:var(--primary);background:var(--card);}
+  .tag-input{font-family:"Sour Gummy",sans-serif;font-size:13px;padding:5px 10px;border-radius:8px;border:2px solid var(--border);background:var(--bg-soft);color:var(--text);}
+  .tag-input:focus{outline:none;border-color:var(--primary);}
+  .tags-display{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+  .tag{background:var(--primary);color:#000;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px;}
+  .tag-x{cursor:pointer;font-weight:900;}
+  .editor-body{font-family:"Sour Gummy",sans-serif;font-size:16px;padding:12px;border-radius:10px;border:2px solid var(--border);background:var(--bg-soft);color:var(--text);width:100%;min-height:220px;resize:vertical;line-height:1.7;}
+  .editor-body:focus{outline:none;border-color:var(--primary);}
+  .editor-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .char-count{font-size:12px;color:var(--muted);align-self:center;}
+  .view-panel{padding:20px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;}
+  .view-title{font-size:26px;font-weight:900;}
+  .view-body{font-size:16px;line-height:1.8;white-space:pre-wrap;}
+  .view-mood{font-size:22px;}
+  .view-tags{display:flex;gap:6px;flex-wrap:wrap;}
+  .search-bar{font-family:"Sour Gummy",sans-serif;font-size:14px;padding:8px 12px;border-radius:8px;border:2px solid var(--border);background:var(--bg);color:var(--text);width:100%;}
+  .search-bar:focus{outline:none;border-color:var(--primary);}
+  .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:20px;}
+  .stat-card{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px;text-align:center;}
+  .stat-num{font-size:28px;font-weight:900;color:var(--text);}
+  .stat-label{font-size:12px;color:var(--muted);margin-top:2px;}
+  .month-group{margin-bottom:16px;}
+  .month-label{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+  .toast{position:absolute;bottom:16px;right:16px;background:var(--primary);color:#000;border-radius:10px;padding:10px 18px;font-weight:700;font-size:14px;opacity:0;transition:opacity 0.3s;pointer-events:none;}
+  .toast.show{opacity:1;}
+  #app{position:relative;}
+  .login-tab-row{display:flex;gap:8px;justify-content:center;}
+  .empty-state{text-align:center;color:var(--muted);padding:30px;font-size:15px;}
+</style>
 
-  toggleBtn.addEventListener("click", () => {
-    document.body.classList.toggle("darkmode");
+<div id="app">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:22px;">📔</span>
+      <h1>TobyK1DD Journal</h1>
+    </div>
+    <div class="topbar-right">
+      <span id="user-label" style="font-size:13px;color:var(--muted);"></span>
+      <button class="btn btn-sm" id="theme-btn">🌙 / ☀️</button>
+      <button class="btn btn-sm btn-ghost" id="logout-btn" style="display:none;">Log out</button>
+    </div>
+  </div>
 
-    // Save preference
-    if (document.body.classList.contains("darkmode")) {
-      localStorage.setItem("theme", "dark");
-    } else {
-      localStorage.setItem("theme", "light");
-    }
+  <div id="login-screen">
+    <h2>Your personal journal</h2>
+    <p>Entries are saved to your username and persist across sessions.</p>
+    <div class="login-tab-row">
+      <button class="btn" id="tab-login" onclick="switchAuth('login')">Log In</button>
+      <button class="btn btn-ghost" id="tab-signup" onclick="switchAuth('signup')">Sign Up</button>
+    </div>
+    <div class="login-box">
+      <label for="un-input">Username</label>
+      <input id="un-input" type="text" placeholder="e.g. tobyk1dd" autocomplete="username">
+      <label for="pw-input">Password</label>
+      <input id="pw-input" type="password" placeholder="Your password" autocomplete="current-password">
+      <div id="pw-confirm-wrap" style="display:none;flex-direction:column;gap:6px;">
+        <label for="pw2-input">Confirm Password</label>
+        <input id="pw2-input" type="password" placeholder="Repeat password">
+      </div>
+      <button class="btn" id="auth-submit-btn" style="margin-top:4px;">Log In</button>
+      <p id="auth-error" style="color:var(--danger);font-size:13px;text-align:center;min-height:16px;"></p>
+    </div>
+    <p style="font-size:12px;color:var(--muted);max-width:300px;text-align:center;">Note: entries are stored in your browser. Use the same device to access them again.</p>
+  </div>
+
+  <div id="journal-screen" style="display:none;">
+    <div style="padding:10px 14px 0;display:flex;gap:6px;border-bottom:2px solid var(--border);">
+      <div class="tab active" id="tab-entries" onclick="showTab('entries')">Entries</div>
+      <div class="tab" id="tab-write" onclick="showTab('write')">Write</div>
+      <div class="tab" id="tab-stats" onclick="showTab('stats')">Stats</div>
+    </div>
+
+    <div id="pane-entries">
+      <div class="main-layout">
+        <div class="sidebar">
+          <h3>Your Entries</h3>
+          <input class="search-bar" id="search-input" placeholder="Search entries..." oninput="renderEntryList()">
+          <div class="entry-list" id="entry-list"></div>
+          <button class="btn btn-sm" style="margin-top:auto;" onclick="newEntry()">+ New Entry</button>
+        </div>
+        <div id="entry-view" class="editor-panel empty">
+          <span style="font-size:40px;">📖</span>
+          <span>Select an entry or write a new one</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="pane-write" style="display:none;">
+      <div class="editor-panel">
+        <input class="editor-title" id="edit-title" placeholder="Entry title..." maxlength="100">
+        <div class="editor-meta">
+          <span id="edit-date-display"></span>
+          <div class="mood-picker" id="mood-picker">
+            <button class="mood-btn" data-mood="😊" onclick="setMood(this)">😊</button>
+            <button class="mood-btn" data-mood="😔" onclick="setMood(this)">😔</button>
+            <button class="mood-btn" data-mood="😤" onclick="setMood(this)">😤</button>
+            <button class="mood-btn" data-mood="😌" onclick="setMood(this)">😌</button>
+            <button class="mood-btn" data-mood="🤩" onclick="setMood(this)">🤩</button>
+            <button class="mood-btn" data-mood="😰" onclick="setMood(this)">😰</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input class="tag-input" id="tag-input" placeholder="Add tag, press Enter" style="width:180px;" onkeydown="handleTagInput(event)">
+          <div class="tags-display" id="tags-display"></div>
+        </div>
+        <textarea class="editor-body" id="edit-body" placeholder="What's on your mind today?" oninput="updateCharCount()"></textarea>
+        <div class="editor-actions">
+          <button class="btn" onclick="saveEntry()">💾 Save Entry</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearEditor()">Clear</button>
+          <span class="char-count" id="char-count">0 characters</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="pane-stats" style="display:none;">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-num" id="st-total">0</div><div class="stat-label">Total Entries</div></div>
+        <div class="stat-card"><div class="stat-num" id="st-streak">0</div><div class="stat-label">Day Streak</div></div>
+        <div class="stat-card"><div class="stat-num" id="st-words">0</div><div class="stat-label">Total Words</div></div>
+      </div>
+      <div style="padding:0 20px 20px;">
+        <h3 style="font-size:14px;font-weight:800;color:var(--muted);margin-bottom:12px;">MOOD BREAKDOWN</h3>
+        <div id="mood-breakdown" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
+        <h3 style="font-size:14px;font-weight:800;color:var(--muted);margin:18px 0 10px;">TOP TAGS</h3>
+        <div id="top-tags" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+let currentUser = null;
+let entries = [];
+let selectedId = null;
+let editingId = null;
+let currentMood = "";
+let currentTags = [];
+let authMode = "login";
+
+function storageKey(user){ return "journal_entries_" + user; }
+function usersKey(){ return "journal_users"; }
+
+function getUsers(){
+  try{ return JSON.parse(localStorage.getItem(usersKey()) || "{}"); }
+  catch(e){ return {}; }
+}
+function saveUsers(u){ localStorage.setItem(usersKey(), JSON.stringify(u)); }
+
+function loadEntries(){
+  if(!currentUser) return [];
+  try{ return JSON.parse(localStorage.getItem(storageKey(currentUser)) || "[]"); }
+  catch(e){ return []; }
+}
+function saveEntries(){
+  if(!currentUser) return;
+  localStorage.setItem(storageKey(currentUser), JSON.stringify(entries));
+}
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2200);
+}
+
+function switchAuth(mode){
+  authMode = mode;
+  document.getElementById("tab-login").className = mode==="login"?"btn":"btn btn-ghost";
+  document.getElementById("tab-signup").className = mode==="signup"?"btn":"btn btn-ghost";
+  document.getElementById("pw-confirm-wrap").style.display = mode==="signup"?"flex":"none";
+  document.getElementById("auth-submit-btn").textContent = mode==="login"?"Log In":"Sign Up";
+  document.getElementById("auth-error").textContent="";
+}
+
+document.getElementById("auth-submit-btn").onclick = function(){
+  const un = document.getElementById("un-input").value.trim().toLowerCase();
+  const pw = document.getElementById("pw-input").value;
+  const err = document.getElementById("auth-error");
+  if(!un || !pw){ err.textContent="Please fill in all fields."; return; }
+  const users = getUsers();
+  if(authMode==="signup"){
+    const pw2 = document.getElementById("pw2-input").value;
+    if(pw !== pw2){ err.textContent="Passwords don't match."; return; }
+    if(users[un]){ err.textContent="Username already taken."; return; }
+    if(un.length < 3){ err.textContent="Username must be 3+ characters."; return; }
+    users[un] = btoa(pw);
+    saveUsers(users);
+    login(un);
+  } else {
+    if(!users[un] || users[un] !== btoa(pw)){ err.textContent="Incorrect username or password."; return; }
+    login(un);
+  }
+};
+
+function login(un){
+  currentUser = un;
+  entries = loadEntries();
+  document.getElementById("login-screen").style.display="none";
+  document.getElementById("journal-screen").style.display="block";
+  document.getElementById("user-label").textContent = "@" + un;
+  document.getElementById("logout-btn").style.display="inline-block";
+  renderEntryList();
+  showTab("entries");
+}
+
+document.getElementById("logout-btn").onclick = function(){
+  currentUser = null; entries = []; selectedId = null;
+  document.getElementById("login-screen").style.display="flex";
+  document.getElementById("journal-screen").style.display="none";
+  document.getElementById("user-label").textContent="";
+  document.getElementById("logout-btn").style.display="none";
+  document.getElementById("un-input").value="";
+  document.getElementById("pw-input").value="";
+  document.getElementById("auth-error").textContent="";
+};
+
+document.getElementById("theme-btn").onclick = function(){
+  document.getElementById("app").classList.toggle("dark");
+};
+
+function showTab(tab){
+  ["entries","write","stats"].forEach(t=>{
+    document.getElementById("pane-"+t).style.display = t===tab?"block":"none";
+    document.getElementById("tab-"+t).className = t===tab?"tab active":"tab";
   });
+  if(tab==="stats") renderStats();
+}
+
+function genId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+
+function newEntry(){
+  editingId = null; currentMood=""; currentTags=[];
+  document.getElementById("edit-title").value="";
+  document.getElementById("edit-body").value="";
+  document.getElementById("edit-date-display").textContent = new Date().toLocaleDateString("en-GB",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  renderMoodPicker(); renderTagsDisplay(); updateCharCount();
+  showTab("write");
+}
+
+function clearEditor(){
+  editingId=null; currentMood=""; currentTags=[];
+  document.getElementById("edit-title").value="";
+  document.getElementById("edit-body").value="";
+  renderMoodPicker(); renderTagsDisplay(); updateCharCount();
+}
+
+function saveEntry(){
+  const title = document.getElementById("edit-title").value.trim() || "Untitled";
+  const body = document.getElementById("edit-body").value.trim();
+  if(!body){ showToast("Write something first!"); return; }
+  const now = new Date();
+  if(editingId){
+    const e = entries.find(x=>x.id===editingId);
+    if(e){ e.title=title; e.body=body; e.mood=currentMood; e.tags=[...currentTags]; e.updatedAt=now.toISOString(); }
+  } else {
+    entries.unshift({id:genId(),title,body,mood:currentMood,tags:[...currentTags],createdAt:now.toISOString(),updatedAt:now.toISOString()});
+  }
+  saveEntries(); renderEntryList(); showToast("Entry saved!"); showTab("entries");
+}
+
+function deleteEntry(id){
+  entries = entries.filter(e=>e.id!==id);
+  saveEntries(); selectedId=null; renderEntryList();
+  document.getElementById("entry-view").innerHTML='<span style="font-size:40px;">📖</span><span>Select an entry or write a new one</span>';
+  document.getElementById("entry-view").className="editor-panel empty";
+  showToast("Entry deleted.");
+}
+
+function editEntry(id){
+  const e = entries.find(x=>x.id===id);
+  if(!e) return;
+  editingId=id; currentMood=e.mood||""; currentTags=[...e.tags||[]];
+  document.getElementById("edit-title").value=e.title;
+  document.getElementById("edit-body").value=e.body;
+  document.getElementById("edit-date-display").textContent = new Date(e.createdAt).toLocaleDateString("en-GB",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  renderMoodPicker(); renderTagsDisplay(); updateCharCount();
+  showTab("write");
+}
+
+function selectEntry(id){
+  selectedId=id;
+  const e = entries.find(x=>x.id===id);
+  if(!e) return;
+  renderEntryList();
+  const v = document.getElementById("entry-view");
+  v.className="view-panel";
+  v.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+      <div class="view-title">${esc(e.title)}</div>
+      <div class="view-mood">${e.mood||""}</div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);">${new Date(e.createdAt).toLocaleDateString("en-GB",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}</div>
+    ${e.tags&&e.tags.length?`<div class="view-tags">${e.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>`:""}
+    <div class="view-body">${esc(e.body)}</div>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="btn btn-sm" onclick="editEntry('${e.id}')">✏️ Edit</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteEntry('${e.id}')">🗑️ Delete</button>
+    </div>
+  `;
+}
+
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function renderEntryList(){
+  const q = (document.getElementById("search-input").value||"").toLowerCase();
+  const list = document.getElementById("entry-list");
+  const filtered = entries.filter(e=>!q||(e.title+e.body+(e.tags||[]).join(" ")).toLowerCase().includes(q));
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty-state">${q?"No entries match your search.":"No entries yet. Start writing!"}</div>`;
+    return;
+  }
+  const groups={};
+  filtered.forEach(e=>{
+    const m=new Date(e.createdAt).toLocaleDateString("en-GB",{year:"numeric",month:"long"});
+    if(!groups[m]) groups[m]=[];
+    groups[m].push(e);
+  });
+  list.innerHTML=Object.keys(groups).map(m=>`
+    <div class="month-group">
+      <div class="month-label">${m}</div>
+      ${groups[m].map(e=>`
+        <div class="entry-item${selectedId===e.id?" selected":""}" onclick="selectEntry('${e.id}')">
+          <div class="entry-item-title">${e.mood?e.mood+" ":""} ${esc(e.title)}</div>
+          <div class="entry-item-date">${new Date(e.createdAt).toLocaleDateString("en-GB",{day:"numeric",month:"short"})}</div>
+          <div class="entry-item-preview">${esc(e.body).slice(0,60)}...</div>
+        </div>
+      `).join("")}
+    </div>
+  `).join("");
+}
+
+function setMood(btn){
+  const mood = btn.dataset.mood;
+  currentMood = currentMood===mood?"":mood;
+  renderMoodPicker();
+}
+
+function renderMoodPicker(){
+  document.querySelectorAll(".mood-btn").forEach(b=>b.classList.toggle("active",b.dataset.mood===currentMood));
+}
+
+function handleTagInput(e){
+  if(e.key==="Enter"){
+    const v=document.getElementById("tag-input").value.trim().toLowerCase();
+    if(v && !currentTags.includes(v) && currentTags.length<8){ currentTags.push(v); renderTagsDisplay(); }
+    document.getElementById("tag-input").value="";
+  }
+}
+
+function removeTag(t){ currentTags=currentTags.filter(x=>x!==t); renderTagsDisplay(); }
+
+function renderTagsDisplay(){
+  document.getElementById("tags-display").innerHTML=currentTags.map(t=>`<span class="tag">${esc(t)} <span class="tag-x" onclick="removeTag('${esc(t)}')">&times;</span></span>`).join("");
+}
+
+function updateCharCount(){
+  const v=document.getElementById("edit-body").value;
+  document.getElementById("char-count").textContent=v.length+" characters · "+(v.trim()?v.trim().split(/\s+/).length:0)+" words";
+}
+
+function renderStats(){
+  const total=entries.length;
+  const words=entries.reduce((a,e)=>a+(e.body.trim()?e.body.trim().split(/\s+/).length:0),0);
+  document.getElementById("st-total").textContent=total;
+  document.getElementById("st-words").textContent=words.toLocaleString();
+  const streak=calcStreak();
+  document.getElementById("st-streak").textContent=streak;
+  const moods={};
+  entries.forEach(e=>{if(e.mood){moods[e.mood]=(moods[e.mood]||0)+1;}});
+  document.getElementById("mood-breakdown").innerHTML=Object.entries(moods).sort((a,b)=>b[1]-a[1]).map(([m,c])=>`<div class="stat-card" style="min-width:70px;"><div class="stat-num">${m}</div><div class="stat-label">${c}x</div></div>`).join("")||"<span style='color:var(--muted);font-size:14px;'>No moods logged yet</span>";
+  const tags={};
+  entries.forEach(e=>(e.tags||[]).forEach(t=>{tags[t]=(tags[t]||0)+1;}));
+  document.getElementById("top-tags").innerHTML=Object.entries(tags).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([t,c])=>`<span class="tag">${esc(t)} <span style='font-weight:400;opacity:0.7;'>(${c})</span></span>`).join("")||"<span style='color:var(--muted);font-size:14px;'>No tags yet</span>";
+}
+
+function calcStreak(){
+  const dates=new Set(entries.map(e=>new Date(e.createdAt).toDateString()));
+  let streak=0,d=new Date();
+  while(dates.has(d.toDateString())){streak++;d.setDate(d.getDate()-1);}
+  return streak;
+}
+
+document.getElementById("pw-input").addEventListener("keydown",e=>{ if(e.key==="Enter") document.getElementById("auth-submit-btn").click(); });
+document.getElementById("un-input").addEventListener("keydown",e=>{ if(e.key==="Enter") document.getElementById("pw-input").focus(); });
+
+updateCharCount();
+document.getElementById("edit-date-display").textContent = new Date().toLocaleDateString("en-GB",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
 </script>
-<script src="JavaNotes.js"></script>
-</body>
-</html>
