@@ -68,6 +68,147 @@ button:hover { background-color: var(--bg); color: var(--text); }
 }
 #change-darkmode:hover { background: var(--btn-bg); }
 
+  #site-banner {
+  width: 100%;
+  background-color: var(--bg);
+  margin-bottom: 0;
+}
+
+/* ── site title bar ── */
+#site-title {
+  background-color: var(--bg);
+  color: var(--text);
+  text-align: center;
+  font-size: 40px;
+  font-family: monospace, "Sour Gummy", sans-serif;
+  font-weight: 900;
+  padding: 10px 0 6px;
+  letter-spacing: 0.01em;
+}
+
+/* ── svg header image ── */
+#site-header-img {
+  display: block;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto 4px;
+}
+
+/* ── navigation bar ── */
+#site-nav {
+  width: 100%;
+  background-color: var(--bg);
+  padding: 6px 0;
+  text-align: center;
+}
+
+#site-nav .nav-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+#site-nav .nav-links a,
+#site-nav .nav-links button {
+  font-family: "Sour Gummy", sans-serif;
+  font-size: 16px;
+  color: var(--btn-text);
+  background-color: var(--btn-bg);
+  border: 3px solid var(--border);
+  padding: 8px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-block;
+  line-height: 1;
+}
+
+#site-nav .nav-links a:hover,
+#site-nav .nav-links button:hover {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* dark mode toggle inside nav */
+#site-nav .nav-darkmode {
+  font-size: 14px;
+  padding: 8px 14px;
+  white-space: nowrap;
+}
+
+/* divider line under nav */
+#site-banner-divider {
+  width: 100%;
+  border: none;
+  border-top: 1px solid var(--accent);
+  margin: 8px 0 0;
+}
+
+@media (max-width: 600px) {
+  #site-title { font-size: 28px; }
+  #site-nav .nav-links { gap: 6px; }
+  #site-nav .nav-links a,
+  #site-nav .nav-links button { font-size: 13px; padding: 6px 12px; }
+}
+
+/* ── preview-only styles (remove in your app) ── */
+.preview-note {
+  background: rgba(0,0,0,0.08);
+  border: 2px dashed var(--accent);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-top: 20px;
+  font-size: 13px;
+  line-height: 1.7;
+  opacity: 0.75;
+}
+.preview-note code {
+  font-family: monospace;
+  background: rgba(0,0,0,0.1);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     SITE BANNER — copy this entire block into
+     the top of <body> in your app
+══════════════════════════════════════════════ -->
+<div id="site-banner">
+
+  <!-- site title -->
+  <div id="site-title">TobyK1DD's World</div>
+
+  <!-- header SVG image from your site -->
+  <img
+    id="site-header-img"
+    src="https://tobyk1dd.github.io/TobyK1DD/Header3.svg"
+    alt="TobyK1DD header"
+    onerror="this.style.display='none'"
+  >
+
+  <!-- navigation links -->
+  <nav id="site-nav">
+    <div class="nav-links">
+      <a href="https://tobyk1dd.github.io/TobyK1DD/Index.html">Home</a>
+      <a href="https://tobyk1dd.github.io/TobyK1DD/About Me.html">About Me</a>
+      <a href="https://tobyk1dd.github.io/TobyK1DD/Blog.html">Blog</a>
+      <a href="https://tobyk1dd.github.io/TobyK1DD/My Work.html">My Work</a>
+      <a href="https://tobyk1dd.github.io/TobyK1DD/Contact.html">Contact</a>
+      <a href="https://linktr.ee/tobyk1dd" target="_blank" rel="noopener">Links</a>
+      <button class="nav-darkmode" onclick="document.body.classList.toggle('darkmode'); this.textContent = document.body.classList.contains('darkmode') ? '☀️ Light' : '🌙 Dark'">🌙 Dark</button>
+    </div>
+  </nav>
+
+  <hr id="site-banner-divider">
+
+</div>
+
 /* ── auth buttons (top-left) — only 2 shown at a time ── */
 #auth-btns {
   position: fixed; top: 20px; left: 20px;
